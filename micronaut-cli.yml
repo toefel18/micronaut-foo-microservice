@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: micronaut.foo.microservice
+---
+testFramework: junit
+sourceLanguage: kotlin

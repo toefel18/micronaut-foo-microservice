@@ -1,0 +1,20 @@
+---
+micronaut:
+  application:
+    name: micronaut-foo-microservice
+
+---
+micronaut:
+  metrics:
+    enabled: true
+
+---
+micronaut:
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+
+
+datasources.default: {}
