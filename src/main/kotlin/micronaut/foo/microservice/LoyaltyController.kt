@@ -2,39 +2,39 @@ package micronaut.foo.microservice
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import micronaut.foo.microservice.dto.LogEntry
 import micronaut.foo.microservice.dto.LoyaltyOverview
-import java.time.LocalDate
-import java.time.LocalDateTime
+import micronaut.foo.microservice.dto.User
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import javax.inject.Inject
 
 @Controller("/loyalty")
 class LoyaltyController {
 
     @Inject
+    lateinit var overviewService: OverviewService
+
+    @Inject
     lateinit var placeholderClient: PlaceholderClient
 
     @Get("/")
-    fun index(): LoyaltyOverview {
-        val res = placeholderClient.fetchUsers()
-        println(res)
-        return LoyaltyOverview(
-            points = 200,
-            date = LocalDate.now(),
-            entries = listOf(
-                LogEntry(
-                    ts = LocalDateTime.now(),
-                    amount = 100,
-                    description = "Boek bij"
-                ),
-                LogEntry(
-                    ts = LocalDateTime.now(),
-                    amount = 100,
-                    description = "Boek bij 2"
-                )
-            )
-        )
+    fun loyaltyOverview(): LoyaltyOverview {
+        return overviewService.createOverview()
     }
 
+    @Get("/mono")
+    fun loyaltyOverviewMono(): Mono<LoyaltyOverview> {
+        return Mono.just(overviewService.createOverview())
+    }
 
+    @Get("/users")
+    fun listUsers(): List<User> {
+        return placeholderClient.fetchUsers()
+    }
+
+    @Get("/users-mono")
+    fun listUsersMono(): Mono<List<User>> {
+        // schedule long-running task on other thread-pool using subscribeOn
+        return Mono.fromCallable {  placeholderClient.fetchUsers() }.subscribeOn(Schedulers.elastic())
+    }
 }
